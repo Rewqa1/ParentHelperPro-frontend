@@ -8,6 +8,6 @@ enum categorys
   illness,
   psychology,
   stories,
-  tips,
+  hints,
   other
 }
