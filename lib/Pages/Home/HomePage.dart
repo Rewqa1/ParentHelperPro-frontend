@@ -4,6 +4,7 @@ import '../Profile/ProfilePage.dart';
 import '../Hints/HintGames.dart';
 import '../Hints/HintSport.dart';
 import '../Hints/HintParenting.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -19,6 +20,7 @@ class HomePage extends StatelessWidget {
             color: Colors.white,
             icon: Icon(Icons.person),
             onPressed: () {
+              AppMetrica.reportEvent('toProfilePage');
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -94,6 +96,7 @@ class HomePage extends StatelessWidget {
         onTap: (index) {
           if (index == 0) {}
           if (index == 1) {
+            AppMetrica.reportEvent('toCategorysPage');
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CategorysPage()),
@@ -109,6 +112,7 @@ class HomePage extends StatelessWidget {
   Widget hitImg(BuildContext context, String imagePath, Widget route) {
     return GestureDetector(
       onTap: () {
+        AppMetrica.reportEvent('toGamesPage');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => route),

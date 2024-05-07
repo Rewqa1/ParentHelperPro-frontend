@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:PHelperPro/components/icon.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: IconButton(
           icon: backArrowIcon, // Путь к вашему изображению кнопки назад
           onPressed: () {
+            AppMetrica.reportEvent('toHomePage');
             Navigator.pop(context); // вернуться на предыдущий экран
           },
         ),

@@ -3,6 +3,7 @@ import '../Home/HomePage.dart';
 import '../Profile/ProfilePage.dart';
 import '/enumCategorys.dart';
 import '/djangoRequest.dart';
+import '../Publications/PublicationPage.dart';
 
 class CategorysPage extends StatefulWidget {
   @override
@@ -12,6 +13,31 @@ class CategorysPage extends StatefulWidget {
 class _CategorysPageState extends State<CategorysPage> {
   List<categorys> _selectedCategories = [];
   bool _isCategorySelectionExpanded = false;
+  int _currentPage = 1;
+  int _postsPerPage = 9; // Количество постов на одной странице
+  int _totalPosts = 0;
+  List<dynamic>? _posts;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPosts();
+  }
+
+  Future<void> fetchPosts() async {
+    try {
+      final List<dynamic>? posts = await getPosts(_currentPage, _postsPerPage);
+      if (posts != null) {
+        setState(() {
+          _totalPosts = posts.length;
+          // Очищаем список и добавляем только необходимое количество постов
+          _posts = posts.take(_postsPerPage).toList();
+        });
+      }
+    } catch (e) {
+      print('Failed to fetch posts: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,18 +72,16 @@ class _CategorysPageState extends State<CategorysPage> {
                 ),
                 IconButton(
                   icon: Icon(Icons.search),
-                  onPressed: () async {
-                    int userId = await getPostCount();
-                    String userlogin = await getUserName(0);
-                    print(userlogin);
-                  },
+                  onPressed: () {},
                 ),
               ],
             ),
             SizedBox(height: 16),
             _buildCategorySelectionButton(),
             SizedBox(height: 16),
-            _buildPublicationsList(), // Здесь будет список публикаций
+            _buildPublicationsList(),
+            SizedBox(height: 16),
+            _buildPaginationButtons(),
             SizedBox(height: 16),
           ],
         ),
@@ -82,7 +106,6 @@ class _CategorysPageState extends State<CategorysPage> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
           }
-          // Навигация на страницу публикаций (уже находимся на этой странице)
         },
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white,
@@ -110,9 +133,12 @@ class _CategorysPageState extends State<CategorysPage> {
             });
           },
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
           ),
-          child: Text(_selectedCategories.isEmpty ? 'Выбрать категории' : _getSelectedCategoriesNames()),
+          child: Text(_selectedCategories.isEmpty
+              ? 'Выбрать категории'
+              : _getSelectedCategoriesNames()),
         ),
         Visibility(
           visible: _isCategorySelectionExpanded,
@@ -137,14 +163,15 @@ class _CategorysPageState extends State<CategorysPage> {
                             }
                           });
                         },
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        materialTapTargetSize:
+                        MaterialTapTargetSize.shrinkWrap,
                       ),
                       SizedBox(width: 4),
                       Text(
                         _translateCategory(category),
-                        style: TextStyle(fontSize: 14), // уменьшим размер текста
+                        style: TextStyle(fontSize: 14),
                       ),
-                      SizedBox(width: 4), // уменьшим отступы между элементами
+                      SizedBox(width: 4),
                     ],
                   );
                 }),
@@ -157,39 +184,58 @@ class _CategorysPageState extends State<CategorysPage> {
   }
 
   String _getSelectedCategoriesNames() {
-    return _selectedCategories.map((category) => _translateCategory(category)).join(', ');
+    return _selectedCategories
+        .map((category) => _translateCategory(category))
+        .join(', ');
   }
 
   Widget _buildPublicationsList() {
-    // Здесь нужно будет отобразить список публикаций
-    // Можно использовать ListView.builder для динамического построения списка
-    return Container(
-      color: Colors.grey[200], // Серый фон
-      child: ListView.builder(
-        itemCount: 10, // Пример количества публикаций
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(
-              'Название публикации $index',
-              style: TextStyle(
-                color: Colors.black,
-              ),
+    return _posts != null
+        ? ListView.builder(
+      shrinkWrap: true,
+      itemCount: _posts!.length,
+      itemBuilder: (context, index) {
+        final post = _posts![index];
+        String title = post['title'].toString();
+        String content = post['content'].toString();
+        if (content.length > 120) {
+          content = content.substring(0, 120) + '...';
+        }
+        return ListTile(
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            subtitle: Text(
-              'Краткий текст публикации $index',
-              style: TextStyle(
-                color: Colors.black,
+          ),
+          subtitle: Text(
+            content,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () async {
+            String userName = await getUserName(post['user_id']);
+            String userSurname = await getUserSurname(post['user_id']);
+            String postTitle = post['title'];
+            String postContent = post['content'];
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PublicationPage(
+                  userName: userName,
+                  userSurname: userSurname,
+                  postTitle: postTitle,
+                  postContent: postContent,
+                ),
               ),
-            ),
-            onTap: () {
-              // Добавьте функционал выбора публикации
-              print('Выбрана публикация номер $index');
-            },
-          );
-        },
-      ),
+            );
+          },
+        );
+      },
+    )
+        : Center(
+      child: CircularProgressIndicator(),
     );
   }
 
@@ -219,4 +265,45 @@ class _CategorysPageState extends State<CategorysPage> {
         return '';
     }
   }
+
+  Widget _buildPaginationButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: _currentPage > 1 ? () => _changePage(-1) : null,
+          child: Text('Предыдущая'),
+        ),
+        SizedBox(width: 16),
+        ElevatedButton(
+          onPressed: _currentPage * _postsPerPage < _totalPosts
+              ? () => _changePage(1)
+              : null,
+          child: Text('Следующая'),
+        ),
+      ],
+    );
+  }
+
+  void _changePage(int increment) {
+    setState(() {
+      _currentPage += increment;
+      fetchNextPagePosts();
+    });
+  }
+
+  Future<void> fetchNextPagePosts() async {
+    try {
+      final List<dynamic>? nextPagePosts = await getPosts(_currentPage, _postsPerPage);
+      if (nextPagePosts != null) {
+        setState(() {
+          _posts?.clear();
+          _posts?.addAll(nextPagePosts);
+        });
+      }
+    } catch (e) {
+      print('Failed to fetch posts: $e');
+    }
+  }
+
 }

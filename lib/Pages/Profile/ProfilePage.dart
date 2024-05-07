@@ -3,6 +3,7 @@ import '../Categorys/CategorysPage.dart';
 import '../Home/HomePage.dart';
 import '../Settings/SettingsPage.dart';
 import 'package:PHelperPro/components/icon.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -18,6 +19,7 @@ class ProfilePage extends StatelessWidget {
             color: Colors.white,
             icon: const Icon(Icons.settings),
             onPressed: () {
+              AppMetrica.reportEvent('toSettingsPage');
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -91,12 +93,14 @@ class ProfilePage extends StatelessWidget {
         onTap: (index) {
           // Обработка нажатия на BottomNavigationBar
           if (index == 0) {
+            AppMetrica.reportEvent('toHomePage');
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => HomePage()),
             );
           }
           if(index == 1) {
+            AppMetrica.reportEvent('toCategorysPage');
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CategorysPage()),
