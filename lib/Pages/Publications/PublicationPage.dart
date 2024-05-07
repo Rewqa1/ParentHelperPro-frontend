@@ -30,17 +30,17 @@ class PublicationPage extends StatelessWidget {
               '$userName $userSurname',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text(
-              postTitle.toUpperCase(),
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
             SizedBox(height: 16),
-            Expanded(
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              padding: EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                 child: Text(
                   postContent,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ),
             ),
