@@ -1,8 +1,8 @@
 import 'package:PHelperPro/components/icon.dart';
-import 'package:appmetrica_plugin/appmetrica_plugin.dart';
-import 'package:flutter/material.dart';
 import 'package:PHelperPro/components/login_reg_textfield.dart';
 import 'package:PHelperPro/components/registration_button.dart';
+import 'package:flutter/material.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class RegistrationPage extends StatelessWidget {
   RegistrationPage({super.key});
@@ -15,31 +15,41 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0, // удалить тень под AppBar
-        leading: IconButton(
-          icon: backArrowIcon, // Путь к вашему изображению кнопки назад
-          onPressed: () {
-            Navigator.pop(context); // вернуться на предыдущий экран
-          },
-        ),
-      ),
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
+        child: GestureDetector(
+          onTap: (){
+            FocusScope.of(context).unfocus();
+          },      
+        child: SingleChildScrollView(
+          reverse: true,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 47),
-              Container(
-                width: 208,
-                height: 189,
-                child: Center(
-                  child: Image.asset(
-                    'assets/logo.png', // Путь к вашему изображению логотипа
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: 5,),
+                  IconButton(
+                    icon: backArrowIcon,
+                    onPressed: () {
+                      AppMetrica.reportEvent('RegisterPageBackToLoginPage');
+                      Navigator.pop(context);
+                    },
+                  ),
+                  SizedBox(width: 17,),
+                  Container(
                     width: 208,
                     height: 189,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 208,
+                        height: 189,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 15),
               Text(
@@ -47,7 +57,7 @@ class RegistrationPage extends StatelessWidget {
                 style: TextStyle(
                   color: Color(0xFF000000),
                   fontSize: 32,
-                  fontFamily: 'Montserrat', // Только указываем семейство шрифта
+                  fontFamily: 'Montserrat',
                 ),
               ),
               const SizedBox(height: 35),
@@ -78,12 +88,13 @@ class RegistrationPage extends StatelessWidget {
               RegButton(
                 text: 'Зарегистрироваться',
                 onTap: () {
-                  AppMetrica.reportEvent('Registration button');
+                  AppMetrica.reportEvent('RegistrationButton');
                 },
               ),
             ],
           ),
         ),
+      ),
       ),
     );
   }

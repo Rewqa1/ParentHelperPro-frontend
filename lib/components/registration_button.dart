@@ -13,13 +13,13 @@ class RegButton extends StatelessWidget {
     final buttonWidth = screenWidth - 15;
     final buttonHeight = 40.0;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0), // Исправлено значение отступа
-      child: GestureDetector(
+      padding: const EdgeInsets.symmetric(horizontal: 0), 
+      child: InkWell(
         onTap: onTap,
         child: Container(
           width: buttonWidth,
           height: buttonHeight,
-          padding: const EdgeInsets.all(8.0), // Исправлено значение отступа
+          padding: const EdgeInsets.all(8.0), 
           decoration: BoxDecoration(
             color: Color(0xFFE09B58),
             borderRadius: BorderRadius.circular(20.0),
@@ -33,7 +33,7 @@ class RegButton extends StatelessWidget {
               ),
             ),
           ),
-        ),  
+        ),
       ),
     );
   }

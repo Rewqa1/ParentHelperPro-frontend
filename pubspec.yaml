@@ -38,6 +38,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   appmetrica_plugin: ^2.0.0
   http: ^1.2.1
+  pigeon: ^18.0.0
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +85,11 @@ flutter:
     - assets/Images/
     - assets/Global_UI/backarrowicon.png
     - assets/Global_UI/backarrowicon.svg
+    - assets/Global_UI/profileicon.svg
+    - assets/Global_UI/settingsicon.svg
+    - assets/Global_UI/searchicon.svg
+    - assets/Global_UI/cancelicon.svg
+    - assets/logo.svg
     - assets/Images/hitImg1.png
     - assets/Images/hitImg2.png
     - assets/Images/hitImg3.png

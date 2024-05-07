@@ -35,13 +35,13 @@ class _LoginTextFieldState extends State<LoginTextField> {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Container(
-            width: width, // Задать ширину
-            height: height, // Задать высоту
+            width: width, 
+            height: height, 
             child: TextField(
               controller: widget.controller,
               obscureText: _obscureText,
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 5), // Задать отступы для текста
+                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 5), 
                 enabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
                   borderRadius: BorderRadius.circular(5.0),
