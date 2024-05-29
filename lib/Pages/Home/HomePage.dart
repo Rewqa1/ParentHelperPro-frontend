@@ -37,43 +37,21 @@ class HomePage extends StatelessWidget {
               'Советы от приложения',
               style: TextStyle(fontSize: 24, color: Colors.black87),
             ),
-            SizedBox(height: 0),
-            Container(
-              width: 500.0,
-              height: 500.0,
-              child: Stack(
+            SizedBox(height: 16),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3,
+                childAspectRatio: 1,
                 children: [
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            hitImg(context, 'assets/Images/hitImg1.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg2.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg3.png', HintGames()),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            hitImg(context, 'assets/Images/hitImg4.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg5.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg6.png', HintGames()),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            hitImg(context, 'assets/Images/hitImg7.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg8.png', HintGames()),
-                            hitImg(context, 'assets/Images/hitImg9.png', HintGames()),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  hitImg(context, 'assets/Images/hitImg1.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg2.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg3.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg4.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg5.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg6.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg7.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg8.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg9.png', HintGames()),
                 ],
               ),
             )
@@ -94,7 +72,6 @@ class HomePage extends StatelessWidget {
           ),
         ],
         onTap: (index) {
-          if (index == 0) {}
           if (index == 1) {
             AppMetrica.reportEvent('toCategorysPage');
             Navigator.push(
@@ -120,8 +97,6 @@ class HomePage extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.all(5),
-        width: 100,
-        height: 100,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage(imagePath),
