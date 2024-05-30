@@ -2,8 +2,8 @@ import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import '../Home/HomePage.dart';
 import '../Profile/ProfilePage.dart';
-import '/enumCategorys.dart';
-import '/djangoRequest.dart';
+import '../../enumCategorys.dart';
+import '../../djangoRequest.dart';
 import '../Publications/PublicationPage.dart';
 
 class CategorysPage extends StatefulWidget {
@@ -14,10 +14,8 @@ class CategorysPage extends StatefulWidget {
 class _CategorysPageState extends State<CategorysPage> {
   List<categorys> _selectedCategories = [];
   bool _isCategorySelectionExpanded = false;
-  int _currentPage = 1;
-  int _postsPerPage = 9;
-  int _totalPosts = 0;
-  List<dynamic>? _posts;
+  List<dynamic> _posts = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -26,17 +24,21 @@ class _CategorysPageState extends State<CategorysPage> {
   }
 
   Future<void> fetchPosts() async {
-    try {
-      final List<dynamic>? posts = await getPosts(_currentPage, _postsPerPage);
-      if (posts != null) {
-        setState(() {
-          _totalPosts = posts.length;
+    setState(() {
+      _isLoading = true;
+    });
 
-          _posts = posts.take(_postsPerPage).toList();
-        });
-      }
+    try {
+      final List<dynamic> posts = await getPosts(1, 3);
+      setState(() {
+        _posts = posts;
+      });
     } catch (e) {
       print('Failed to fetch posts: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -61,31 +63,31 @@ class _CategorysPageState extends State<CategorysPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildSearchBar(),
-                ),
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            _buildCategorySelectionButton(),
-            SizedBox(height: 16),
-            _buildPublicationsList(),
-            SizedBox(height: 16),
-            _buildPaginationButtons(),
-            SizedBox(height: 16),
-          ],
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSearchBar(),
+              ),
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          _buildCategorySelectionButton(),
+          SizedBox(height: 16),
+          Expanded(
+            child: _buildPublicationsList(),
+          ),
+          if (_isLoading)
+            Center(child: CircularProgressIndicator()),
+          SizedBox(height: 16),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 222, 154, 87),
@@ -135,49 +137,44 @@ class _CategorysPageState extends State<CategorysPage> {
           },
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.grey,
           ),
-          child: Text(_selectedCategories.isEmpty
-              ? 'Выбрать категории'
-              : _getSelectedCategoriesNames()),
+          child: Text(
+            _selectedCategories.isEmpty
+                ? 'Выбрать теги'
+                : 'Выбранные теги: ${_getSelectedCategoriesNames()}',
+            textAlign: TextAlign.center,
+          ),
         ),
         Visibility(
           visible: _isCategorySelectionExpanded,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            height: 200,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(categorys.values.length, (index) {
-                  var category = categorys.values.elementAt(index);
-                  return Row(
-                    children: [
-                      Checkbox(
-                        value: _selectedCategories.contains(category),
-                        onChanged: (checked) {
-                          setState(() {
-                            if (checked!) {
-                              _selectedCategories.add(category);
-                            } else {
-                              _selectedCategories.remove(category);
-                            }
-                          });
-                        },
-                        materialTapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        _translateCategory(category),
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      SizedBox(width: 4),
-                    ],
-                  );
-                }),
-              ),
-            ),
+          child: Wrap(
+            children: List.generate(categorys.values.length, (index) {
+              var category = categorys.values.elementAt(index);
+              return Row(
+                children: [
+                  Checkbox(
+                    value: _selectedCategories.contains(category),
+                    onChanged: (checked) {
+                      setState(() {
+                        if (checked!) {
+                          _selectedCategories.add(category);
+                        } else {
+                          _selectedCategories.remove(category);
+                        }
+                      });
+                    },
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    translateCategory(category),
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  SizedBox(width: 4),
+                ],
+              );
+            }),
           ),
         ),
       ],
@@ -186,37 +183,50 @@ class _CategorysPageState extends State<CategorysPage> {
 
   String _getSelectedCategoriesNames() {
     return _selectedCategories
-        .map((category) => _translateCategory(category))
+        .map((category) => translateCategory(category))
         .join(', ');
   }
 
   Widget _buildPublicationsList() {
-    return _posts != null
-        ? ListView.builder(
-      shrinkWrap: true,
-      itemCount: _posts!.length,
+    return ListView.builder(
+      itemCount: _posts.length,
       itemBuilder: (context, index) {
-        final post = _posts![index];
+        final post = _posts[index];
         String title = post['title'].toString();
         String content = post['content'].toString();
+        List<dynamic> tags = post['tags']; //Получаем список тегов из поста
+        String tagsString = tags.map((tagIndex) => translateCategory(returnCategory(tagIndex))).join(', ');
         if (content.length > 120) {
           content = content.substring(0, 120) + '...';
         }
         return ListTile(
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(
-            content,
-            style: TextStyle(fontSize: 16),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                content,
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 4),
+              Text(
+                '$tagsString', //Выводим список тегов
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
           onTap: () async {
-            String userName = await getUserName(post['user_id']);
-            String userSurname = await getUserSurname(post['user_id']);
+            String userName = await getUserName(post['user']);
+            String userSurname = await getUserSurname(post['user']);
             String postTitle = post['title'];
             String postContent = post['content'];
             AppMetrica.reportEvent('Просмотр публикаций');
@@ -234,77 +244,6 @@ class _CategorysPageState extends State<CategorysPage> {
           },
         );
       },
-    )
-        : const Center(
-      child: CircularProgressIndicator(),
     );
   }
-
-  String _translateCategory(categorys category) {
-    switch (category) {
-      case categorys.parenting:
-        return 'воспитание';
-      case categorys.education:
-        return 'обучение';
-      case categorys.games:
-        return 'игры';
-      case categorys.nutrition:
-        return 'питание';
-      case categorys.sports:
-        return 'спорт';
-      case categorys.illness:
-        return 'здоровье';
-      case categorys.psychology:
-        return 'психология';
-      case categorys.stories:
-        return 'здоровье';
-      case categorys.hints:
-        return 'советы';
-      case categorys.other:
-        return 'другое';
-      default:
-        return '';
-    }
-  }
-
-  Widget _buildPaginationButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: _currentPage > 1 ? () => _changePage(-1) : null,
-          child: Text('Предыдущая'),
-        ),
-        SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: _currentPage * _postsPerPage < _totalPosts
-              ? () => _changePage(1)
-              : null,
-          child: Text('Следующая'),
-        ),
-      ],
-    );
-  }
-
-  void _changePage(int increment) {
-    setState(() {
-      _currentPage += increment;
-      fetchNextPagePosts();
-    });
-  }
-
-  Future<void> fetchNextPagePosts() async {
-    try {
-      final List<dynamic>? nextPagePosts = await getPosts(_currentPage, _postsPerPage);
-      if (nextPagePosts != null) {
-        setState(() {
-          _posts?.clear();
-          _posts?.addAll(nextPagePosts);
-        });
-      }
-    } catch (e) {
-      print('Failed to fetch posts: $e');
-    }
-  }
-
 }

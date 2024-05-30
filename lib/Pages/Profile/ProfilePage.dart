@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../Categorys/CategorysPage.dart';
 import '../Home/HomePage.dart';
 import '../Settings/SettingsPage.dart';
-import 'package:PHelperPro/components/icon.dart';
+import '../Publications/NewPublicationPage.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -32,19 +32,35 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Аватар
             CircleAvatar(
               radius: 80,
               backgroundImage: AssetImage('assets/background.jpg'),
             ),
             SizedBox(height: 20),
-            // Имя пользователя
             Text(
               'Чуань Ци',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            // Статья
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey, // Цвет кнопки
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(20),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NewPublicationPage()),
+                );
+              },
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -60,9 +76,8 @@ class ProfilePage extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  // Текст статьи
                   Text(
-                    'текст',
+                    'Как готовить с детьми, нужно всего лишь...',
                     style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: 10),
@@ -91,7 +106,6 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
         onTap: (index) {
-          // Обработка нажатия на BottomNavigationBar
           if (index == 0) {
             AppMetrica.reportEvent('toHomePage');
             Navigator.push(
