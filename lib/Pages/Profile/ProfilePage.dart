@@ -61,34 +61,6 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Заголовок статьи
-                  Text(
-                    'Китайская мудрость',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Как готовить с детьми, нужно всего лишь...',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 10),
-                  // Теги
-                  Text(
-                    'Питание, спорт',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
