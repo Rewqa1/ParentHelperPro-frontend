@@ -219,6 +219,7 @@ Future<String?> getRefreshToken() async {
   return prefs.getString('refreshToken');
 }
 
+
 Future<void> refreshToken() async {
   final prefs = await SharedPreferences.getInstance();
   final refreshToken = prefs.getString('refreshToken');
@@ -264,4 +265,43 @@ Future<bool> verifyToken(String token) async {
     print('Error verifying token: $e');
     return false;
   }
+}
+
+Future<bool> passwordResetRequest(String userName, String secretWord) async{
+  final url = Uri.parse('http://195.10.205.87:8000/password_reset_request/');
+  final body = jsonEncode({
+    "username": userName,
+    "secret_word": secretWord
+  });
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: body,
+  );
+  if (response.statusCode == 200){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+Future<bool> passwordReset(String userName, String secretWord, String newPassword, String confirmNewPassword) async{
+  bool canChangePassword = await passwordResetRequest(userName, secretWord);
+  final url = Uri.parse('http://195.10.205.87:8000/password_reset/');
+  final body = jsonEncode({
+    "username": userName,
+    "new_password": newPassword,
+    "confirm_password": confirmNewPassword
+  });
+  if (canChangePassword == true){
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+    if (response.statusCode == 200){
+      return true;
+    }
+  }
+  return false;
 }

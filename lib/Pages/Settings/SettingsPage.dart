@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:PHelperPro/components/icon.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:PHelperPro/Pages/Login/LoginPage.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
+}
+
+Future<void> logout(BuildContext context) async{
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove('accessToken');
+  await prefs.remove('refreshToken');
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+      (route) => false,
+    );
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -91,6 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(height: 8.0),
             TextButton(
               onPressed: () {
+                logout(context);
 
               },
               style: TextButton.styleFrom(

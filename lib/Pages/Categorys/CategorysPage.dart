@@ -139,11 +139,19 @@ class _CategorysPageState extends State<CategorysPage> {
             foregroundColor: Colors.white,
             backgroundColor: Colors.grey,
           ),
-          child: Text(
-            _selectedCategories.isEmpty
-                ? 'Выбрать теги'
-                : 'Выбранные теги: ${_getSelectedCategoriesNames()}',
-            textAlign: TextAlign.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _selectedCategories.isEmpty
+                    ? 'Фильтрация'
+                    : 'Фильтрация', // можно вставить ${_getSelectedCategoriesNames()} если решить проблему размерности
+                textAlign: TextAlign.center,
+              ),
+              Icon(
+                _isCategorySelectionExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+              ),
+            ],
           ),
         ),
         Visibility(
@@ -181,6 +189,7 @@ class _CategorysPageState extends State<CategorysPage> {
     );
   }
 
+
   String _getSelectedCategoriesNames() {
     return _selectedCategories
         .map((category) => translateCategory(category))
@@ -199,49 +208,59 @@ class _CategorysPageState extends State<CategorysPage> {
         if (content.length > 120) {
           content = content.substring(0, 120) + '...';
         }
-        return ListTile(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
+        return Container(
+          color: Colors.grey[300], // Серый фон для каждого ListTile
+          margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+          child: ListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                content,
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 4),
-              Text(
-                '$tagsString', //Выводим список тегов
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+                SizedBox(height: 4),
+                Container(
+                  color: Colors.grey[400], // Более темный серый фон для содержимого поста
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    content,
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 4),
+                Center( // Центровка текста тегов
+                  child: Text(
+                    '$tagsString', // Выводим список тегов
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            onTap: () async {
+              String userName = await getUserName(post['user']);
+              String userSurname = await getUserSurname(post['user']);
+              String postTitle = post['title'];
+              String postContent = post['content'];
+              AppMetrica.reportEvent('Просмотр публикаций');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PublicationPage(
+                    userName: userName,
+                    userSurname: userSurname,
+                    postTitle: postTitle,
+                    postContent: postContent,
+                  ),
+                ),
+              );
+            },
           ),
-          onTap: () async {
-            String userName = await getUserName(post['user']);
-            String userSurname = await getUserSurname(post['user']);
-            String postTitle = post['title'];
-            String postContent = post['content'];
-            AppMetrica.reportEvent('Просмотр публикаций');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PublicationPage(
-                  userName: userName,
-                  userSurname: userSurname,
-                  postTitle: postTitle,
-                  postContent: postContent,
-                ),
-              ),
-            );
-          },
         );
       },
     );

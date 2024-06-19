@@ -6,7 +6,8 @@ class PublicationPage extends StatelessWidget {
   final String postTitle;
   final String postContent;
 
-  const PublicationPage({super.key,
+  const PublicationPage({
+    super.key,
     required this.userName,
     required this.userSurname,
     required this.postTitle,
@@ -21,7 +22,7 @@ class PublicationPage extends StatelessWidget {
         titleTextStyle: TextStyle(color: Colors.white),
         backgroundColor: Color.fromARGB(255, 222, 154, 87),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,11 +38,9 @@ class PublicationPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               padding: EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Text(
-                  postContent,
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
+              child: Text(
+                postContent,
+                style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
           ],
