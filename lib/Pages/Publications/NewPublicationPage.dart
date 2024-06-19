@@ -60,7 +60,7 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
                 items: categorys.values.map((category) {
                   return DropdownMenuItem<categorys>(
                     value: category,
-                    child: Text(translateCategory(category)),
+                    child: Text(translateCategoryByCategory(category)),
                   );
                 }).toList(),
                 onChanged: (category) {
@@ -76,7 +76,7 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
               Wrap(
                 children: _selectedCategories.map((category) {
                   return Chip(
-                    label: Text(translateCategory(category)),
+                    label: Text(translateCategoryByCategory(category)),
                     onDeleted: () {
                       setState(() {
                         _selectedCategories.remove(category);
@@ -116,7 +116,7 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
 
                       print('Заголовок: ${_titleController.text}');
                       print('Текст: ${_contentController.text}');
-                      print('Категории: ${_selectedCategories.map((category) => translateCategory(category)).join(', ')}');
+                      print('Категории: ${_selectedCategories.map((category) => translateCategoryByCategory(category)).join(', ')}');
 
                       //await createPost(postNewIndex, 2, _titleController.text, _contentController.text, categoriesIndices);
                     }

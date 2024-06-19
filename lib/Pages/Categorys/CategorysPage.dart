@@ -176,7 +176,7 @@ class _CategorysPageState extends State<CategorysPage> {
                   ),
                   SizedBox(width: 4),
                   Text(
-                    translateCategory(category),
+                    translateCategoryByCategory(category),
                     style: TextStyle(fontSize: 14),
                   ),
                   SizedBox(width: 4),
@@ -192,7 +192,7 @@ class _CategorysPageState extends State<CategorysPage> {
 
   String _getSelectedCategoriesNames() {
     return _selectedCategories
-        .map((category) => translateCategory(category))
+        .map((category) => translateCategoryByCategory(category))
         .join(', ');
   }
 
@@ -204,7 +204,7 @@ class _CategorysPageState extends State<CategorysPage> {
         String title = post['title'].toString();
         String content = post['content'].toString();
         List<dynamic> tags = post['tags']; //Получаем список тегов из поста
-        String tagsString = tags.map((tagIndex) => translateCategory(returnCategory(tagIndex))).join(', ');
+        String tagsString = tags.map((tagIndex) => translateCategoryByCategory(returnCategory(tagIndex))).join(', ');
         if (content.length > 120) {
           content = content.substring(0, 120) + '...';
         }

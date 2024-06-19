@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
+  
   Future<bool> _checkLoginStatus() async { //Возвращение false ведет к бесконечной загрузке
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           return false;
         }
       }
-      print('Access token is valid.');
+      print('Access token is valid');
       return true;
     }
     print('No tokens found.');
