@@ -16,20 +16,23 @@ class _CategorysPageState extends State<CategorysPage> {
   bool _isCategorySelectionExpanded = false;
   List<dynamic> _posts = [];
   bool _isLoading = false;
+  TextEditingController _searchController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    fetchPosts();
+    List<String> empt = [];
+    fetchPosts("", empt);
   }
 
-  Future<void> fetchPosts() async {
+  Future<void> fetchPosts(String title, List<String> tags) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final List<dynamic> posts = await getPosts(1, 3);
+      final List<dynamic> posts = await getPosts(title, tags);
       setState(() {
         _posts = posts;
       });
@@ -44,83 +47,97 @@ class _CategorysPageState extends State<CategorysPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Публикации'),
-        titleTextStyle: TextStyle(color: Colors.white),
-        backgroundColor: Color.fromARGB(255, 222, 154, 87),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            color: Colors.white,
-            icon: Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: 16),
-          Row(
+    return GestureDetector(
+      onTap: () {
+        // Закрываем клавиатуру при касании любой области экрана
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Публикации'),
+          titleTextStyle: TextStyle(color: Colors.white),
+          backgroundColor: Color.fromARGB(255, 222, 154, 87),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              color: Colors.white,
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              },
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: _buildSearchBar(),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isCategorySelectionExpanded = false;
+                        });
+                      },
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Поиск',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      //ТУТ РАБОТАЕТ ПОИСК
+                      List<String> nowSelectedCategories = getCategoryStrings(_selectedCategories);
+                      fetchPosts(_searchController.text, nowSelectedCategories);
+                    },
+                  ),
+                ],
               ),
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {},
-              ),
+              SizedBox(height: 16),
+              _buildCategorySelectionButton(),
+              SizedBox(height: 16),
+              _buildPublicationsList(),
+              if (_isLoading) Center(child: CircularProgressIndicator()),
+              SizedBox(height: 16),
             ],
           ),
-          SizedBox(height: 16),
-          _buildCategorySelectionButton(),
-          SizedBox(height: 16),
-          Expanded(
-            child: _buildPublicationsList(),
-          ),
-          if (_isLoading)
-            Center(child: CircularProgressIndicator()),
-          SizedBox(height: 16),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 222, 154, 87),
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: '',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          }
-        },
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return const TextField(
-      decoration: InputDecoration(
-        hintText: 'Поиск',
-        border: OutlineInputBorder(),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Color.fromARGB(255, 222, 154, 87),
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: '',
+            ),
+          ],
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            }
+          },
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+        ),
       ),
     );
   }
@@ -132,7 +149,10 @@ class _CategorysPageState extends State<CategorysPage> {
         ElevatedButton(
           onPressed: () {
             setState(() {
+              // Инвертируем состояние фильтрации при нажатии на кнопку "Фильтрация"
               _isCategorySelectionExpanded = !_isCategorySelectionExpanded;
+              // Закрываем клавиатуру при открытии фильтрации
+              FocusScope.of(context).unfocus();
             });
           },
           style: ElevatedButton.styleFrom(
@@ -189,22 +209,17 @@ class _CategorysPageState extends State<CategorysPage> {
     );
   }
 
-
-  String _getSelectedCategoriesNames() {
-    return _selectedCategories
-        .map((category) => translateCategoryByCategory(category))
-        .join(', ');
-  }
-
   Widget _buildPublicationsList() {
     return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemCount: _posts.length,
       itemBuilder: (context, index) {
         final post = _posts[index];
         String title = post['title'].toString();
         String content = post['content'].toString();
         List<dynamic> tags = post['tags']; //Получаем список тегов из поста
-        String tagsString = tags.map((tagIndex) => translateCategoryByCategory(returnCategory(tagIndex))).join(', ');
+        String tagsString = tags.map((tagIndex) => translateCategoryByText(tagIndex)).join(', ');
         if (content.length > 120) {
           content = content.substring(0, 120) + '...';
         }
@@ -243,19 +258,27 @@ class _CategorysPageState extends State<CategorysPage> {
               ],
             ),
             onTap: () async {
-              String userName = await getUserName(post['user']);
-              String userSurname = await getUserSurname(post['user']);
+              String avatarUrl = await getUserAvatarUrl(post['id']);
+              String userName = await getUserName(post['id']);
+              String userSurname = await getUserSurname(post['id']);
               String postTitle = post['title'];
               String postContent = post['content'];
+              int id = post['id'];
+              int user = post['user'];
+              List<dynamic> posts = await getPostsByPostId(post['id']) as List;
               AppMetrica.reportEvent('Просмотр публикаций');
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PublicationPage(
+                    avatarUrl: avatarUrl,
                     userName: userName,
                     userSurname: userSurname,
                     postTitle: postTitle,
                     postContent: postContent,
+                    id: id,
+                    user: user,
+                    posts: posts,
                   ),
                 ),
               );
@@ -264,5 +287,12 @@ class _CategorysPageState extends State<CategorysPage> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.dispose(); // Убедимся, что контроллер прокрутки освобожден
+    super.dispose();
   }
 }

@@ -212,78 +212,97 @@ class _ProfilePageState extends State<ProfilePage> {
               } else if (lastNameSnapshot.hasError) {
                 return Text('Error: ${lastNameSnapshot.error}');
               } else if (lastNameSnapshot.hasData) {
-                String userName = firstNameSnapshot.data!;
-                String userSurname = lastNameSnapshot.data!;
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PublicationPage(
-                          userName: userName,
-                          userSurname: userSurname,
-                          postTitle: post['title'] ?? '',
-                          postContent: post['content'] ?? '',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    color: Colors.grey[200],
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            post['title'] ?? 'No Title',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 12),
-                          Container(
-                            padding: EdgeInsets.all(12),
-                            color: Colors.grey[300],
-                            child: Text(
-                              _truncateContent(post['content'] ?? 'No Content'),
-                              style: TextStyle(fontSize: 14),
-                              textAlign: TextAlign.center,
+                return FutureBuilder<String>(
+                  future: getUserAvatarUrl(post['id']), // Fetch avatarUrl asynchronously
+                  builder: (context, avatarSnapshot) {
+                    if (avatarSnapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (avatarSnapshot.hasError) {
+                      return Text('Error fetching avatar: ${avatarSnapshot.error}');
+                    } else if (avatarSnapshot.hasData) {
+                      String avatarUrl = avatarSnapshot.data!;
+                      String userName = firstNameSnapshot.data!;
+                      String userSurname = lastNameSnapshot.data!;
+                      return GestureDetector(
+                        onTap: () async { // Добавляем async здесь
+                          List<dynamic> posts = await getPostsByPostId(post['id']) as List; // Используем await здесь
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PublicationPage(
+                                avatarUrl: avatarUrl,
+                                userName: userName,
+                                userSurname: userSurname,
+                                postTitle: post['title'] ?? '',
+                                postContent: post['content'] ?? '',
+                                id: post['id'] ?? '',
+                                user: post['user'] ?? '',
+                                posts: posts,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                          color: Colors.grey[200],
+                          child: Container(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  post['title'] ?? 'No Title',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 12),
+                                Container(
+                                  padding: EdgeInsets.all(12),
+                                  color: Colors.grey[300],
+                                  child: Text(
+                                    _truncateContent(post['content'] ?? 'No Content'),
+                                    style: TextStyle(fontSize: 14),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                FutureBuilder<List<dynamic>>(
+                                  future: getUserPostTags(index),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      return Text('Failed to load tags: ${snapshot.error}');
+                                    } else if (snapshot.hasData) {
+                                      List<dynamic> tags = snapshot.data!;
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: tags.asMap().entries.map((entry) {
+                                          int idx = entry.key;
+                                          dynamic tag = entry.value;
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 4),
+                                            child: Text(
+                                              '${translateCategoryByText(tag.toString())}${idx != tags.length - 1 ? ',' : ''}',
+                                              style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      );
+                                    } else {
+                                      return Text('No tags available');
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 12),
-                          FutureBuilder<List<dynamic>>(
-                            future: getUserPostTags(index), // передаем индекс поста в массиве posts
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Failed to load tags: ${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                List<dynamic> tags = snapshot.data!;
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: tags.asMap().entries.map((entry) {
-                                    int idx = entry.key;
-                                    dynamic tag = entry.value;
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 4),
-                                      child: Text(
-                                        '${translateCategoryByText(tag.toString())}${idx != tags.length - 1 ? ',' : ''}',
-                                        style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                                      ),
-                                    );
-                                  }).toList(),
-                                );
-                              } else {
-                                return Text('No tags available');
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
+                      );
+                    } else {
+                      return Text('No avatar URL available');
+                    }
+                  },
                 );
               } else {
                 return Text('No data available');

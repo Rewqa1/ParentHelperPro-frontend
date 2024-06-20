@@ -1,5 +1,4 @@
-enum categorys
-{
+enum categorys {
   parenting,
   education,
   games,
@@ -12,7 +11,7 @@ enum categorys
   other
 }
 
-categorys returnCategory(int index) { //ИНДЕКС НАЧИНАЕТСЯ с 1 ПОТОМУЧТО БЕКЭНД
+categorys returnCategory(int index) {
   switch (index) {
     case 1:
       return categorys.parenting;
@@ -83,7 +82,7 @@ String translateCategoryByText(String tagName) {
     case 'psychology':
       return 'психология';
     case 'stories':
-      return 'рассказы';
+      return 'истории';
     case 'hints':
       return 'советы';
     case 'other':
@@ -110,7 +109,7 @@ String translateCategoryByCategory(categorys category) {
     case categorys.psychology:
       return 'психология';
     case categorys.stories:
-      return 'здоровье';
+      return 'истории';
     case categorys.hints:
       return 'советы';
     case categorys.other:
@@ -118,4 +117,39 @@ String translateCategoryByCategory(categorys category) {
     default:
       return '';
   }
+}
+
+String translateCategoryByCategoryEng(categorys category) {
+  switch (category) {
+    case categorys.parenting:
+      return 'parenting';
+    case categorys.education:
+      return 'education';
+    case categorys.games:
+      return 'games';
+    case categorys.nutrition:
+      return 'nutrition';
+    case categorys.sports:
+      return 'sports';
+    case categorys.illness:
+      return 'illness';
+    case categorys.psychology:
+      return 'psychology';
+    case categorys.stories:
+      return 'stories';
+    case categorys.hints:
+      return 'hints';
+    case categorys.other:
+      return 'other';
+    default:
+      return '';
+  }
+}
+
+Future<List<String>> getCategoryStringsByIndices(List<int> indices) async {
+  return indices.map((index) => translateCategoryByCategoryEng(returnCategory(index))).toList();
+}
+
+List<String> getCategoryStrings(List<categorys> categories) {
+  return categories.map((category) => translateCategoryByCategoryEng(category)).toList();
 }
