@@ -2,30 +2,108 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<List<dynamic>> getPosts(int currentPage, int postsPerPage) async {
-  try {
-    final response = await http.get(Uri.parse('http://195.10.205.87:8000/api/v1/postlist/?page=$currentPage&perPage=$postsPerPage'));
+//http://195.10.205.87:8000/posts/?title=
+String _urlTitle(String title) {
+    if(title != "") {
+      return "title=$title";
+    }
+    else {
+      return "";
+    }
+}
 
-    if (response.statusCode == 200) {
-      final dynamic data = json.decode(utf8.decode(response.bodyBytes));
+//http://195.10.205.87:8000/posts/?tags=parenting&tags=hints
+String _urlTags(List<String> tags) {
+  String addUrl = "?";
+  if(tags != []) {
+    for(int i = 0; i < tags.length; i++) {
+      String addTag = tags[i];
+      addUrl += "tags=$addTag";
+      if(i+1 < tags.length) {
+        addUrl += "&";
+      }
+    }
+    return addUrl;
+  }
+  else {
+    return "";
+  }
+}
 
-      if (data is Map<String, dynamic> && data.containsKey('posts')) {
-        final dynamic postsData = data['posts'];
+Future<List<dynamic>> getPosts(String title, List<String> tags) async {
+  print("Ищется посты по заголовку: $title");
+  print("И тегам: $tags");
+  if((title == null || title.isEmpty) && (tags == null || tags.isEmpty)) {
+    try {
+      final response = await http.get(
+          Uri.parse('http://195.10.205.87:8000/api/v1/postlist/'));
 
-        if (postsData is List<dynamic>) {
-          return postsData;
+      if (response.statusCode == 200) {
+        final dynamic data = json.decode(utf8.decode(response.bodyBytes));
+
+        if (data is Map<String, dynamic> && data.containsKey('posts')) {
+          final dynamic postsData = data['posts'];
+
+          if (postsData is List<dynamic>) {
+            return postsData;
+          } else {
+            throw Exception('Посты не лист?');
+          }
         } else {
-          throw Exception('Посты не лист?');
+          throw Exception('Посты не найдены');
         }
       } else {
-        throw Exception('Посты не найдены');
+        throw Exception('Ошибка загрузки постов ${response.statusCode}');
       }
-    } else {
-      throw Exception('Ошибка загрузки постов ${response.statusCode}');
+    } catch (e) {
+      print('Ошибка фетча постов $e');
+      return [];
     }
-  } catch (e) {
-    print('Ошибка фетча постов $e');
-    return [];
+  }
+  else {
+    //http://195.10.205.87:8000/posts/?tags=parenting&tags=hints&title= ЕСЛИ ЕСТЬ И ТЕГИ И title
+    //http://195.10.205.87:8000/posts/?title= ЕСЛИ ЕСТЬ title
+    //http://195.10.205.87:8000/posts/?tags=parenting&tags=hints ЕСЛИ ЕСТЬ ТЕГИ
+    String customUrl = "http://195.10.205.87:8000/posts/";
+    if((title == null || title.isEmpty) && (tags != null || !tags.isEmpty)) {
+      customUrl += _urlTags(tags);
+    }
+    else if((title != null || !title.isEmpty) && (tags == null || tags.isEmpty)) {
+      customUrl += "?";
+      customUrl += _urlTitle(title);
+    }
+    else {
+      customUrl += _urlTags(tags);
+      customUrl += "&";
+      customUrl += _urlTitle(title);
+    }
+    print("NEW URL: $customUrl");
+    try {
+      final response = await http.get(Uri.parse(customUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+
+        if (data is List) {
+          return data; // Если data уже является списком
+        } else if (data is Map<String, dynamic> && data.containsKey('posts')) {
+          final postsData = data['posts'];
+
+          if (postsData is List) {
+            return postsData;
+          } else {
+            throw Exception('Посты не являются списком');
+          }
+        } else {
+          throw Exception('Посты не найдены');
+        }
+      } else {
+        throw Exception('Ошибка загрузки постов ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Ошибка фетча постов $e');
+      return [];
+    }
   }
 }
 
@@ -151,50 +229,96 @@ Future<int> getPostUserId(int id_post) async {
   }
 }
 
+Future<List<dynamic>> getPostsByPostId(int idPost) async {
+  try {
+    var apiUrl = 'http://195.10.205.87:8000/user/profile_by_post/$idPost/';
+    var response = await http.get(Uri.parse(apiUrl));
 
-Future<String> getUserName(int id_user) async {
-  var response = await http.get(Uri.parse('http://195.10.205.87:8000/api/v1/userlist/'));
+    if (response.statusCode == 200) {
+      var data = json.decode(utf8.decode(response.bodyBytes));
+      if (data is Map<String, dynamic> && data.containsKey('posts')) {
+        return data['posts'];
+      } else {
+        throw Exception('Некорректный формат данных');
+      }
+    } else {
+      throw Exception('Ошибка: ${response.statusCode} - ${response.reasonPhrase}');
+    }
+  } catch (e) {
+    print('Ошибка при загрузке постов по id_post: $e');
+    throw Exception('Произошла ошибка при загрузке данных');
+  }
+}
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-    if (data.isNotEmpty) {
-      for (int i = 0; i < data.length; i++) {
-        Map<String, dynamic> user = data[i];
-        if (user['id'] == id_user) {
+Future<String> getUserName(int id_post) async {
+  try {
+    var response = await http.get(Uri.parse('http://195.10.205.87:8000/user/profile_by_post/$id_post/'));
+
+    if (response.statusCode == 200) {
+      var data = json.decode(utf8.decode(response.bodyBytes));
+      if (data is Map<String, dynamic> && data.containsKey('user')) {
+        var user = data['user'];
+        if (user != null && user.containsKey('first_name')) {
           return user['first_name'];
+        } else {
+          throw Exception('Не найдено имя пользователя');
         }
+      } else {
+        throw Exception('Некорректный формат данных');
       }
-      throw Exception('Не найден пользователь');
     } else {
-      throw Exception('Не найдены пользователи...');
+      throw Exception('Ошибка: ${response.statusCode} - ${response.reasonPhrase}');
     }
-  } else {
+  } catch (e) {
+    print('Ошибка фетча имени пользователя: $e');
     throw Exception('Произошла ошибка при загрузке данных');
   }
 }
 
-Future<String> getUserSurname(int id_user) async {
-  var response = await http.get(Uri.parse('http://195.10.205.87:8000/api/v1/userlist/'));
+Future<String> getUserSurname(int id_post) async {
+  try {
+    var response = await http.get(Uri.parse('http://195.10.205.87:8000/user/profile_by_post/$id_post/'));
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-    if (data.isNotEmpty) {
-      for(int i = 0; i < data.length; i++) {
-        Map<String, dynamic> user = data[i];
-        if(user['id'] == id_user) {
+    if (response.statusCode == 200) {
+      var data = json.decode(utf8.decode(response.bodyBytes));
+      if (data is Map<String, dynamic> && data.containsKey('user')) {
+        var user = data['user'];
+        if (user != null && user.containsKey('last_name')) {
           return user['last_name'];
+        } else {
+          throw Exception('Не найдено имя пользователя');
         }
+      } else {
+        throw Exception('Некорректный формат данных');
       }
-      throw Exception('Не найден пользователь');
     } else {
-      throw Exception('Не найдены пользователи...');
+      throw Exception('Ошибка: ${response.statusCode} - ${response.reasonPhrase}');
     }
-  } else {
+  } catch (e) {
+    print('Ошибка фетча имени пользователя: $e');
     throw Exception('Произошла ошибка при загрузке данных');
   }
 }
 
+Future<String> getUserAvatarUrl(int id_post) async {
+  try {
+    var response = await http.get(Uri.parse('http://195.10.205.87:8000/user/profile_by_post/$id_post/'));
 
+    if (response.statusCode == 200) {
+      var data = json.decode(utf8.decode(response.bodyBytes));
+      if (data is Map<String, dynamic>) {
+        return data['avatar'];
+      } else {
+        throw Exception('Некорректный формат данных');
+      }
+    } else {
+      throw Exception('Ошибка: ${response.statusCode} - ${response.reasonPhrase}');
+    }
+  } catch (e) {
+    print('Ошибка фетча имени пользователя: $e');
+    throw Exception('Произошла ошибка при загрузке данных');
+  }
+}
 
 
 
@@ -379,9 +503,8 @@ Future<bool> isUserPostOwner(int id_user) async {
 
 Future<void> addPost(int id, int user_id, String title, String content, List<String> tags) async {
   final apiUrl = "http://195.10.205.87:8000/api/v1/postlist/";
-  final token = await getAccessToken(); // Предположим, что у вас есть функция для получения токена доступа
+  final token = await getAccessToken();
 
-  // Просто используем список строк tags
   List<String> tagStrings = List.from(tags);
 
   Map<String, dynamic> postData = {
@@ -389,7 +512,7 @@ Future<void> addPost(int id, int user_id, String title, String content, List<Str
     'user': user_id,
     'title': title,
     'content': content,
-    'tags': tagStrings, // Используем список строк
+    'tags': tagStrings,
   };
 
   try {
@@ -410,5 +533,29 @@ Future<void> addPost(int id, int user_id, String title, String content, List<Str
     }
   } catch (e) {
     print('Error sending request: $e');
+  }
+}
+
+Future<void> deletePost(int postId) async {
+  final apiUrl = "http://195.10.205.87:8000/api/v1/postlist/$postId";
+  final token = await getAccessToken();
+
+  try {
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      print('Post deleted successfully');
+    } else {
+      print('Failed to delete post: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  } catch (e) {
+    print('Error deleting post: $e');
   }
 }

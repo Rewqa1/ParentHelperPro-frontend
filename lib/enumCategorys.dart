@@ -149,3 +149,7 @@ String translateCategoryByCategoryEng(categorys category) {
 Future<List<String>> getCategoryStringsByIndices(List<int> indices) async {
   return indices.map((index) => translateCategoryByCategoryEng(returnCategory(index))).toList();
 }
+
+List<String> getCategoryStrings(List<categorys> categories) {
+  return categories.map((category) => translateCategoryByCategoryEng(category)).toList();
+}
