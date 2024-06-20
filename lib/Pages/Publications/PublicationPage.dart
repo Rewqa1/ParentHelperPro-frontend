@@ -39,7 +39,7 @@ class PublicationPage extends StatelessWidget {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => CategorysPage()), // Перенаправление на страницу категорий
+        MaterialPageRoute(builder: (context) => CategorysPage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,6 +69,7 @@ class PublicationPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ProfileOtherPage(
+                      id: user,
                       avatarUrl: avatarUrl,
                       firstName: userName,
                       lastName: userSurname,
@@ -119,7 +120,6 @@ class PublicationPage extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                       ),
                       onPressed: () {
-                        // Показываем диалоговое окно подтверждения удаления
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -139,8 +139,8 @@ class PublicationPage extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        'Удалить пост',
-                        style: TextStyle(color: Colors.white),
+                        'Удалить публикацию',
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
                   );

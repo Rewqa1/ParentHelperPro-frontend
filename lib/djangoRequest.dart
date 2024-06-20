@@ -559,3 +559,27 @@ Future<void> deletePost(int postId) async {
     print('Error deleting post: $e');
   }
 }
+
+Future<void> deleteUser(int userId) async {
+  final apiUrl = 'http://195.10.205.87:8000/delete_user/$userId/';
+  final token = await getAccessToken();
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      print('Пользователь с ID $userId успешно удален');
+    } else {
+      print('Ошибка при удалении пользователя с ID $userId: ${response.statusCode}');
+      print('Тело ответа: ${response.body}');
+    }
+  } catch (e) {
+    print('Ошибка при удалении пользователя с ID $userId: $e');
+  }
+}

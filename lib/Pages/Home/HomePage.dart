@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import '../Categorys/CategorysPage.dart';
 import '../Profile/ProfilePage.dart';
 import '../Hints/HintGames.dart';
+import '../Hints/HintLearning.dart';
 import '../Hints/HintSport.dart';
-import '../Hints/HintParenting.dart';
+import '../Hints/HintNutrition.dart';
+import '../Hints/HintPunishment.dart';
+import '../Hints/HintFriends.dart';
+import '../Hints/HintIllness.dart';
+import '../Hints/HintDance.dart';
+import '../Hints/HintArt.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class HomePage extends StatelessWidget {
@@ -44,14 +50,14 @@ class HomePage extends StatelessWidget {
                 childAspectRatio: 1,
                 children: [
                   hitImg(context, 'assets/Images/hitImg1.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg2.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg3.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg4.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg5.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg6.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg7.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg8.png', HintGames()),
-                  hitImg(context, 'assets/Images/hitImg9.png', HintGames()),
+                  hitImg(context, 'assets/Images/hitImg2.png', HintLearning()),
+                  hitImg(context, 'assets/Images/hitImg3.png', HintSport()),
+                  hitImg(context, 'assets/Images/hitImg4.png', HintNutrition()),
+                  hitImg(context, 'assets/Images/hitImg5.png', HintPunishment()),
+                  hitImg(context, 'assets/Images/hitImg6.png', HintFriends()),
+                  hitImg(context, 'assets/Images/hitImg7.png', HintIllness()),
+                  hitImg(context, 'assets/Images/hitImg8.png', HintDance()),
+                  hitImg(context, 'assets/Images/hitImg9.png', HintArt()),
                 ],
               ),
             )

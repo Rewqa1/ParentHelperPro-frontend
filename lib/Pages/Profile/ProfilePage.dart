@@ -105,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   } else if (snapshot.hasData) {
                     List<dynamic> posts = snapshot.data!['posts'];
                     if (posts.isEmpty) {
-                      return Center(child: Text('Постов нет :('));
+                      return Center(child: Text('Постов нет.'));
                     } else {
                       return ListView.builder(
                         itemCount: posts.length,
@@ -195,7 +195,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 return Text('Error: ${lastNameSnapshot.error}');
               } else if (lastNameSnapshot.hasData) {
                 return FutureBuilder<String>(
-                  future: getUserAvatarUrl(post['id']), // Fetch avatarUrl asynchronously
+                  future: getUserAvatarUrl(post['id']),
                   builder: (context, avatarSnapshot) {
                     if (avatarSnapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
