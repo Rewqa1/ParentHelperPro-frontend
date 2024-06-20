@@ -124,7 +124,10 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             backgroundColor: Colors.yellow,
-                            content: Text('Пост успешно создан'),
+                            content: Text(
+                              'Пост успешно создан',
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
                         );
                         Navigator.push(
