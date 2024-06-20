@@ -200,7 +200,6 @@ Future<String> getUserSurname(int id_user) async {
 
 
 
-
 const String baseUrl = 'http://192.168.0.122:8000/api/v1/';
 
 Future<void> saveTokens(String accessToken, String refreshToken) async {
@@ -266,6 +265,94 @@ Future<bool> verifyToken(String token) async {
     return false;
   }
 }
+
+Future<Map<String, dynamic>> getUserByToken() async {
+  final token = await getAccessToken();
+
+  if (token == null) {
+    throw Exception('No access token found');
+  }
+
+  final url = 'http://195.10.205.87:8000/get-user-id/';
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'token': token}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      throw Exception('Failed to load user data. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Failed to load user data. Error: $e');
+  }
+}
+
+Future<String> returnFirstName() async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    return userData['first_name'];
+  } catch (e) {
+    print('Error: $e');
+    return "";
+  }
+}
+
+Future<String> returnLastName() async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    return userData['last_name'];
+  } catch (e) {
+    print('Error: $e');
+    return "";
+  }
+}
+
+Future<String> getUserPostTitle(int num) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    List<dynamic> posts = userData['posts'];
+
+    return posts[num]['title'];
+  } catch (e) {
+    throw Exception('Failed to load posts: $e');
+  }
+}
+
+Future<String> getUserPostContent(int num) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    List<dynamic> posts = userData['posts'];
+
+    return posts[num]['content'];
+  } catch (e) {
+    throw Exception('Failed to load posts: $e');
+  }
+}
+
+Future<List<dynamic>> getUserPostTags(int num) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    List<dynamic> posts = userData['posts'];
+
+    if (num >= 0 && num < posts.length) {
+      List<dynamic> tags = posts[num]['tags'];
+      return tags;
+    } else {
+      return [];
+    }
+  } catch (e) {
+    throw Exception('Failed to load posts: $e');
+  }
+}
+
 
 Future<bool> passwordResetRequest(String userName, String secretWord) async{
   final url = Uri.parse('http://195.10.205.87:8000/password_reset_request/');

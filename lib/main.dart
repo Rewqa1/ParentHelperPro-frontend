@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           return false;
         }
       }
-      print('Access token is valid.');
+      print('Access token is valid');
       return true;
     }
     print('No tokens found.');

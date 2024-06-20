@@ -66,7 +66,34 @@ int returnIndex(categorys category) {
   }
 }
 
-String translateCategory(categorys category) {
+String translateCategoryByText(String tagName) {
+  switch (tagName) {
+    case 'parenting':
+      return 'воспитание';
+    case 'education':
+      return 'обучение';
+    case 'games':
+      return 'игры';
+    case 'nutrition':
+      return 'питание';
+    case 'sports':
+      return 'спорт';
+    case 'illness':
+      return 'здоровье';
+    case 'psychology':
+      return 'психология';
+    case 'stories':
+      return 'рассказы';
+    case 'hints':
+      return 'советы';
+    case 'other':
+      return 'другое';
+    default:
+      return tagName;
+  }
+}
+
+String translateCategoryByCategory(categorys category) {
   switch (category) {
     case categorys.parenting:
       return 'воспитание';
