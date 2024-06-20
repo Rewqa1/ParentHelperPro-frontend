@@ -315,6 +315,25 @@ Future<String> returnLastName() async {
   }
 }
 
+Future<String> returnUserName() async {
+  try{
+    Map<String, dynamic> userData = await getUserByToken();
+    return userData['user'];
+  } catch (e){
+    print('Error: $e');
+    return "";
+  }
+}
+
+Future<String> getAvatarUrl() async {
+  try{
+    Map<String, dynamic> userData = await getUserByToken();
+    return userData['avatar'];
+  } catch(e){
+    throw Exception('Ошибка загрузки аватара');
+  }
+}
+
 Future<String> getUserPostTitle(int num) async {
   try {
     Map<String, dynamic> userData = await getUserByToken();

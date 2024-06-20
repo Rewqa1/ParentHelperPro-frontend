@@ -16,14 +16,30 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late Future<String> _firstNameFuture;
   late Future<String> _lastNameFuture;
+  late String _avatarUrl;
   late Future<Map<String, dynamic>> _userDataFuture;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _fetchAvatar();
+    
   }
-
+  Future<void> _fetchAvatar() async {
+    try{
+      String url = await getAvatarUrl();
+      setState(() {
+        _avatarUrl = url;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
   Future<void> _loadUserData() async {
     _firstNameFuture = returnFirstName();
     _lastNameFuture = returnLastName();
@@ -53,95 +69,97 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 80,
-              backgroundImage: AssetImage('assets/background.jpg'),
-            ),
-            SizedBox(height: 20),
-            FutureBuilder<String>(
-              future: _firstNameFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  String firstName = snapshot.data!;
-                  return FutureBuilder<String>(
-                    future: _lastNameFuture,
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 80,
+                    backgroundImage: NetworkImage(_avatarUrl),
+                  ),
+                  SizedBox(height: 20),
+                  FutureBuilder<String>(
+                    future: _firstNameFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return CircularProgressIndicator();
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else if (snapshot.hasData) {
-                        String lastName = snapshot.data!;
-                        return Text(
-                          '$firstName $lastName',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        String firstName = snapshot.data!;
+                        return FutureBuilder<String>(
+                          future: _lastNameFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              String lastName = snapshot.data!;
+                              return Text(
+                                '$firstName $lastName',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              );
+                            } else {
+                              return Text('No data available');
+                            }
+                          },
                         );
                       } else {
                         return Text('No data available');
                       }
                     },
-                  );
-                } else {
-                  return Text('No data available');
-                }
-              },
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: FutureBuilder<Map<String, dynamic>>(
-                future: _userDataFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Failed to load user data: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    List<dynamic> posts = snapshot.data!['posts'];
-                    if (posts.isEmpty) {
-                      return Center(child: Text('Постов нет :('));
-                    } else {
-                      return ListView.builder(
-                        itemCount: posts.length,
-                        itemBuilder: (context, index) {
-                          return _buildPostCard(posts[index], index);
-                        },
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: FutureBuilder<Map<String, dynamic>>(
+                      future: _userDataFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Failed to load user data: ${snapshot.error}'));
+                        } else if (snapshot.hasData) {
+                          List<dynamic> posts = snapshot.data!['posts'];
+                          if (posts.isEmpty) {
+                            return Center(child: Text('Постов нет :('));
+                          } else {
+                            return ListView.builder(
+                              itemCount: posts.length,
+                              itemBuilder: (context, index) {
+                                return _buildPostCard(posts[index], index);
+                              },
+                            );
+                          }
+                        } else {
+                          return Center(child: Text('No data available'));
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey, // Цвет кнопки
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(20),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NewPublicationPage()),
                       );
-                    }
-                  } else {
-                    return Center(child: Text('No data available'));
-                  }
-                },
+                    },
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey, // Цвет кнопки
-                shape: CircleBorder(),
-                padding: EdgeInsets.all(20),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NewPublicationPage()),
-                );
-              },
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-            SizedBox(height: 20),
-          ],
-        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 222, 154, 87),
