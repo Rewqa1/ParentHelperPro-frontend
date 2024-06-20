@@ -8,7 +8,7 @@ import 'package:PHelperPro/components/login_reg_textfield.dart';
 import 'package:PHelperPro/components/login_button.dart';
 import 'package:PHelperPro/components/registration_button.dart';
 import 'package:PHelperPro/Pages/Login/RegisterPage.dart';
-
+import 'package:PHelperPro/Pages/Login/ForgotPasswordPage.dart';
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
@@ -133,11 +133,19 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  'Забыли пароль?',
-                  style: TextStyle(
-                    color: Color(0xFF000000).withOpacity(0.5),
-                    fontSize: 15,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                    );
+                  },
+                  child: Text(
+                    'Забыли пароль?',
+                    style: TextStyle(
+                      color: Color(0xFF000000).withOpacity(0.5),
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ],

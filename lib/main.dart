@@ -61,14 +61,14 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future<bool> _checkLoginStatus() async {
+  Future<bool> _checkLoginStatus() async { //Возвращение false ведет к бесконечной загрузке
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
     final refreshToken = prefs.getString('refreshToken');
 
     if (accessToken != null && refreshToken != null) {
       print('Tokens found: accessToken = $accessToken, refreshToken = $refreshToken');
-      final isValid = await djangoRequest.verifyToken(accessToken);
+      final isValid = await djangoRequest.verifyToken(accessToken); //Проверка токена
       if (!isValid) {
         print('Access token is not valid. Refreshing token...');
         try {
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           return false;
         }
       }
-      print('Access token is valid.');
+      print('Access token is valid');
       return true;
     }
     print('No tokens found.');

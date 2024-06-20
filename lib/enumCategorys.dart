@@ -1,5 +1,4 @@
-enum categorys
-{
+enum categorys {
   parenting,
   education,
   games,
@@ -12,7 +11,7 @@ enum categorys
   other
 }
 
-categorys returnCategory(int index) { //ИНДЕКС НАЧИНАЕТСЯ с 1 ПОТОМУЧТО БЕКЭНД
+categorys returnCategory(int index) {
   switch (index) {
     case 1:
       return categorys.parenting;
@@ -66,7 +65,34 @@ int returnIndex(categorys category) {
   }
 }
 
-String translateCategory(categorys category) {
+String translateCategoryByText(String tagName) {
+  switch (tagName) {
+    case 'parenting':
+      return 'воспитание';
+    case 'education':
+      return 'обучение';
+    case 'games':
+      return 'игры';
+    case 'nutrition':
+      return 'питание';
+    case 'sports':
+      return 'спорт';
+    case 'illness':
+      return 'здоровье';
+    case 'psychology':
+      return 'психология';
+    case 'stories':
+      return 'истории';
+    case 'hints':
+      return 'советы';
+    case 'other':
+      return 'другое';
+    default:
+      return tagName;
+  }
+}
+
+String translateCategoryByCategory(categorys category) {
   switch (category) {
     case categorys.parenting:
       return 'воспитание';
@@ -83,7 +109,7 @@ String translateCategory(categorys category) {
     case categorys.psychology:
       return 'психология';
     case categorys.stories:
-      return 'здоровье';
+      return 'истории';
     case categorys.hints:
       return 'советы';
     case categorys.other:
@@ -91,4 +117,39 @@ String translateCategory(categorys category) {
     default:
       return '';
   }
+}
+
+String translateCategoryByCategoryEng(categorys category) {
+  switch (category) {
+    case categorys.parenting:
+      return 'parenting';
+    case categorys.education:
+      return 'education';
+    case categorys.games:
+      return 'games';
+    case categorys.nutrition:
+      return 'nutrition';
+    case categorys.sports:
+      return 'sports';
+    case categorys.illness:
+      return 'illness';
+    case categorys.psychology:
+      return 'psychology';
+    case categorys.stories:
+      return 'stories';
+    case categorys.hints:
+      return 'hints';
+    case categorys.other:
+      return 'other';
+    default:
+      return '';
+  }
+}
+
+Future<List<String>> getCategoryStringsByIndices(List<int> indices) async {
+  return indices.map((index) => translateCategoryByCategoryEng(returnCategory(index))).toList();
+}
+
+List<String> getCategoryStrings(List<categorys> categories) {
+  return categories.map((category) => translateCategoryByCategoryEng(category)).toList();
 }
