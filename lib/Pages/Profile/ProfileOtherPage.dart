@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../Categorys/CategorysPage.dart';
 import '../Home/HomePage.dart';
 import '../Publications/PublicationPage.dart';
-import '../Publications/NewPublicationPage.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:PHelperPro/djangoRequest.dart';
 import 'package:PHelperPro/enumCategorys.dart';
@@ -37,9 +36,9 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
 
   Future<void> _checkAdminStatus() async {
     try {
-      bool isAdmin = await isUserPostOwner(widget.id);
+      bool isAdmin = await isUserAdmin(widget.id);
       setState(() {
-        _isAdmin = isAdmin;
+        _isAdmin = !isAdmin;
       });
     } catch (e) {
       print('Failed to check admin status: $e');

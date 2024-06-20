@@ -501,6 +501,21 @@ Future<bool> isUserPostOwner(int id_user) async {
   }
 }
 
+Future<bool> isUserAdmin(int id_user) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    if(userData['user_id'] == id_user && userData['admin']) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
+
 Future<void> addPost(int id, int user_id, String title, String content, List<String> tags) async {
   final apiUrl = "http://195.10.205.87:8000/api/v1/postlist/";
   final token = await getAccessToken();
