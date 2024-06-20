@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../enumCategorys.dart';
 import '../../djangoPost.dart';
 import '../../djangoRequest.dart';
+import '../Categorys/CategorysPage.dart';
 
 class NewPublicationPage extends StatefulWidget {
   @override
@@ -111,14 +112,33 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
                         SnackBar(content: Text('Нельзя опубликовать статью не выбрав категории')),
                       );
                     } else {
-                      //List<int> categoriesIndices = await returnMassiveIndex();
-                      //int postNewIndex = await getPostCount()+1;
+                      try {
+                        List<int> categoriesIndices = await returnMassiveIndex(); // Получаем индексы категорий
+                        int lastPostId = await getPostCount() - 1;
+                        int postNewIndex = await getPostId(lastPostId) + 1;
+                        int userIndex = await returnUserIndex();
+                        List<String> categoryStrings = await getCategoryStringsByIndices(categoriesIndices);
 
-                      print('Заголовок: ${_titleController.text}');
-                      print('Текст: ${_contentController.text}');
-                      print('Категории: ${_selectedCategories.map((category) => translateCategoryByCategory(category)).join(', ')}');
+                        await addPost(postNewIndex, userIndex, _titleController.text, _contentController.text, categoryStrings);
 
-                      //await createPost(postNewIndex, 2, _titleController.text, _contentController.text, categoriesIndices);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.yellow,
+                            content: Text('Пост успешно создан'),
+                          ),
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CategorysPage()),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text('Возникла неизвестная ошибка'),
+                          ),
+                        );
+                      }
                     }
                   },
                   child: Text('Опубликовать'),

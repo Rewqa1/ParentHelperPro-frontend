@@ -247,6 +247,7 @@ class _CategorysPageState extends State<CategorysPage> {
               String userSurname = await getUserSurname(post['user']);
               String postTitle = post['title'];
               String postContent = post['content'];
+              int user = post['user'];
               AppMetrica.reportEvent('Просмотр публикаций');
               Navigator.push(
                 context,
@@ -256,6 +257,7 @@ class _CategorysPageState extends State<CategorysPage> {
                     userSurname: userSurname,
                     postTitle: postTitle,
                     postContent: postContent,
+                    user: user,
                   ),
                 ),
               );

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:PHelperPro/djangoRequest.dart';
 
 class PublicationPage extends StatelessWidget {
   final String userName;
   final String userSurname;
   final String postTitle;
   final String postContent;
+  final int user;
 
   const PublicationPage({
     super.key,
@@ -12,7 +14,14 @@ class PublicationPage extends StatelessWidget {
     required this.userSurname,
     required this.postTitle,
     required this.postContent,
+    required this.user,
   });
+
+  Future<void> _deletePost(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Функция удаления поста пока недоступна'),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +51,33 @@ class PublicationPage extends StatelessWidget {
                 postContent,
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
+            ),
+            SizedBox(height: 20),
+            FutureBuilder<bool>(
+              future: isUserPostOwner(user),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData && snapshot.data!) {
+                  return Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Красная кнопка
+                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      ),
+                      onPressed: () => _deletePost(context),
+                      child: Text(
+                        'Удалить пост',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
+                } else {
+                  return SizedBox.shrink();
+                }
+              },
             ),
           ],
         ),

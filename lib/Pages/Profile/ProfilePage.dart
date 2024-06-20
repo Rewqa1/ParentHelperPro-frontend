@@ -206,6 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           userSurname: userSurname,
                           postTitle: post['title'] ?? '',
                           postContent: post['content'] ?? '',
+                          user: post['user'] ?? '',
                         ),
                       ),
                     );

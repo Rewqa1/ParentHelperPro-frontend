@@ -294,6 +294,16 @@ Future<Map<String, dynamic>> getUserByToken() async {
   }
 }
 
+Future<int> returnUserIndex() async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    return userData['user_id'];
+  } catch (e) {
+    print('Error: $e');
+    return 0;
+  }
+}
+
 Future<String> returnFirstName() async {
   try {
     Map<String, dynamic> userData = await getUserByToken();
@@ -349,5 +359,56 @@ Future<List<dynamic>> getUserPostTags(int num) async {
     }
   } catch (e) {
     throw Exception('Failed to load posts: $e');
+  }
+}
+
+Future<bool> isUserPostOwner(int id_user) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    if(userData['user_id'] == id_user || userData['admin']) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
+
+Future<void> addPost(int id, int user_id, String title, String content, List<String> tags) async {
+  final apiUrl = "http://195.10.205.87:8000/api/v1/postlist/";
+  final token = await getAccessToken(); // Предположим, что у вас есть функция для получения токена доступа
+
+  // Просто используем список строк tags
+  List<String> tagStrings = List.from(tags);
+
+  Map<String, dynamic> postData = {
+    'id': id,
+    'user': user_id,
+    'title': title,
+    'content': content,
+    'tags': tagStrings, // Используем список строк
+  };
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(postData),
+    );
+
+    if (response.statusCode == 200) {
+      print('Post updated successfully');
+    } else {
+      print('Failed to update post: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  } catch (e) {
+    print('Error sending request: $e');
   }
 }
