@@ -30,7 +30,7 @@ class RegistrationPage extends StatelessWidget {
     final email = emailController.text.trim();
     
     if (lastName.isEmpty || firstName.isEmpty || username.isEmpty || password.isEmpty || confirmPassword.isEmpty || secretWord.isEmpty || email.isEmpty) {
-      _showErrorDialog(context, 'Пожалуйста, заполните все поля');
+      _showErrorDialog(context, 'Пожалуйста, заполните все необходимые поля');
       return;
     }
 
