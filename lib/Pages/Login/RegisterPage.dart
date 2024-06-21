@@ -58,7 +58,7 @@ class RegistrationPage extends StatelessWidget {
       } else {
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        _showErrorDialog(context, 'Ошибка при регистрации: ${response.body}');
+        _showErrorDialog(context, 'Ошибка при регистрации, проверьте поля на корректность');
       }
     } catch (e) {
       _showErrorDialog(context, 'Произошла ошибка. Попробуйте снова.');
