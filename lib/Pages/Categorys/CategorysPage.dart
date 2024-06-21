@@ -5,6 +5,8 @@ import '../Profile/ProfilePage.dart';
 import '../../enumCategorys.dart';
 import '../../djangoRequest.dart';
 import '../Publications/PublicationPage.dart';
+import 'package:PHelperPro/Pages/Login/LoginPage.dart';
+import 'package:PHelperPro/Pages/Home/HomePage.dart';
 
 class CategorysPage extends StatefulWidget {
   @override
@@ -62,12 +64,21 @@ class _CategorysPageState extends State<CategorysPage> {
             IconButton(
               color: Colors.white,
               icon: Icon(Icons.person),
-              onPressed: () {
+               onPressed: () async {
+              bool hasAccessToken = await checkAccessToken();
+              if (hasAccessToken) {
+                AppMetrica.reportEvent('toProfilePage');
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
-              },
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              }
+            },
             ),
           ],
         ),

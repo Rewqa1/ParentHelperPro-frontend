@@ -14,13 +14,15 @@ import '../Hints/HintDance.dart';
 import '../Hints/HintArt.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
-class HomePage extends StatelessWidget {
-
-  Future<bool> checkAccessToken() async {
+Future<bool> checkAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString('accessToken');
     return accessToken != null;
   }
+  
+class HomePage extends StatelessWidget {
+
+  
 
   @override
   Widget build(BuildContext context) {

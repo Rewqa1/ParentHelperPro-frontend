@@ -533,19 +533,21 @@ Future<bool> passwordResetRequest(String userName, String secretWord) async{
 }
 Future<bool> passwordReset(String userName, String secretWord, String newPassword, String confirmNewPassword) async{
   bool canChangePassword = await passwordResetRequest(userName, secretWord);
-  final url = Uri.parse('http://195.10.205.87:8000/password_reset/');
+  final url = Uri.parse('http://195.10.205.87:8000/password_foggot/');
   final body = jsonEncode({
     "username": userName,
     "new_password": newPassword,
     "confirm_password": confirmNewPassword
   });
   if (canChangePassword == true){
+    print('OKOKOKdadadadasdasdadasdadadadasdasdada');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: body,
     );
     if (response.statusCode == 200){
+      print('dadadadadasdfasfafafasfas');
       return true;
     }
   }
@@ -570,7 +572,7 @@ Future<bool> isUserPostOwner(int id_user) async {
 Future<bool> isUserAdmin(int id_user) async {
   try {
     Map<String, dynamic> userData = await getUserByToken();
-    if(userData['user_id'] == id_user && userData['admin']) {
+    if(userData['user_id'] != id_user && userData['admin']) {
       return true;
     }
     else {

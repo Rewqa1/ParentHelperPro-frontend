@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:PHelperPro/Pages/Login/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,41 +16,49 @@ class RegistrationPage extends StatelessWidget {
   final firstNameController = TextEditingController();
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final emailController = TextEditingController();
-
+  final secretWordController = TextEditingController();
+  
   Future<void> registerUser(BuildContext context) async {
-    final lastName = lastNameController.text;
-    final firstName = firstNameController.text;
-    final username = loginController.text;
-    final password = passwordController.text;
-    final email = emailController.text;
+    final lastName = lastNameController.text.trim();
+    final firstName = firstNameController.text.trim();
+    final username = loginController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+    final secretWord = secretWordController.text.trim();
+    final email = emailController.text.trim();
+    
+    if (lastName.isEmpty || firstName.isEmpty || username.isEmpty || password.isEmpty || confirmPassword.isEmpty || secretWord.isEmpty || email.isEmpty) {
+      _showErrorDialog(context, 'Пожалуйста, заполните все поля');
+      return;
+    }
 
     try {
-      final url = Uri.parse('http://195.10.205.87:8000/register/users/');
+      final url = Uri.parse('http://195.10.205.87:8000/register/');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
+          'email': email,
+          'first_name': firstName,
+          'last_name': lastName,
           'username': username,
           'password': password,
-          'email': email,
+          'secret_word': secretWord,
+          'confirm_password': confirmPassword
         }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = json.decode(response.body);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('accessToken', responseData['access']);
-        await prefs.setString('refreshToken', responseData['refresh']);
-        await prefs.setString('username', username);
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => LoginPage()),
         );
       } else {
-        print(response.statusCode);
-        _showErrorDialog(context, 'Ошибка при регистрации');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        _showErrorDialog(context, 'Ошибка при регистрации: ${response.body}');
       }
     } catch (e) {
       _showErrorDialog(context, 'Произошла ошибка. Попробуйте снова.');
@@ -136,14 +145,20 @@ class RegistrationPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               LoginTextField(
+                controller: loginController,
+                hintText: 'Логин',
+                initialObscureText: false,
+              ),
+              const SizedBox(height: 20),
+              LoginTextField(
                 controller: emailController,
                 hintText: 'Почта',
                 initialObscureText: false,
               ),
               const SizedBox(height: 20),
               LoginTextField(
-                controller: loginController,
-                hintText: 'Логин',
+                controller: secretWordController,
+                hintText: 'Секретное слово',
                 initialObscureText: false,
               ),
               const SizedBox(height: 20),
@@ -152,7 +167,13 @@ class RegistrationPage extends StatelessWidget {
                 hintText: 'Пароль',
                 initialObscureText: true,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
+              LoginTextField(
+                controller: confirmPasswordController,
+                hintText: 'Подтвердите пароль',
+                initialObscureText: true,
+              ),
+              const SizedBox(height: 25),
               RegButton(
                 text: 'Зарегистрироваться',
                 onTap: () {
