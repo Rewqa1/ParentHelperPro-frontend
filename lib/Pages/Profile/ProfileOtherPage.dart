@@ -135,18 +135,18 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
 
   Widget _buildPostsList() {
     if (widget.posts.isEmpty) {
-      return Center(child: Text('Постов нет :('));
+      return Center(child: Text('Постов нет.'));
     } else {
       return ListView.builder(
         itemCount: widget.posts.length,
         itemBuilder: (context, index) {
-          return _buildPostCard(widget.posts[index]);
+          return _buildPostCard(widget.posts[index], index);
         },
       );
     }
   }
 
-  Widget _buildPostCard(dynamic post) {
+  Widget _buildPostCard(dynamic post, int index) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -190,7 +190,7 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
               ),
               SizedBox(height: 12),
               FutureBuilder<List<dynamic>>(
-                future: getUserPostTags(post['id']),
+                future: getUserPostTags(widget.posts[index]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -198,8 +198,10 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
                     return Text('Failed to load tags: ${snapshot.error}');
                   } else if (snapshot.hasData) {
                     List<dynamic> tags = snapshot.data!;
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 2.0,
+                      runSpacing: 2.0,
                       children: tags.asMap().entries.map((entry) {
                         int idx = entry.key;
                         dynamic tag = entry.value;
@@ -207,10 +209,7 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
                           padding: EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
                             '${translateCategoryByText(tag.toString())}${idx != tags.length - 1 ? ',' : ''}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                            ),
+                            style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
                           ),
                         );
                       }).toList(),

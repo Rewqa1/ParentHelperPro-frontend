@@ -249,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 SizedBox(height: 12),
                                 FutureBuilder<List<dynamic>>(
-                                  future: getUserPostTags(index),
+                                  future: getUserPostTagsWithToken(index),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                       return CircularProgressIndicator();
@@ -257,8 +257,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       return Text('Failed to load tags: ${snapshot.error}');
                                     } else if (snapshot.hasData) {
                                       List<dynamic> tags = snapshot.data!;
-                                      return Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                      return Wrap(
+                                        alignment: WrapAlignment.center,
+                                        spacing: 2.0,
+                                        runSpacing: 2.0,
                                         children: tags.asMap().entries.map((entry) {
                                           int idx = entry.key;
                                           dynamic tag = entry.value;
