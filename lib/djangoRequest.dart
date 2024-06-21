@@ -322,8 +322,6 @@ Future<String> getUserAvatarUrl(int id_post) async {
 
 
 
-
-
 const String baseUrl = 'http://192.168.0.122:8000/api/v1/';
 
 Future<void> saveTokens(String accessToken, String refreshToken) async {
@@ -490,7 +488,7 @@ Future<String> getUserPostContent(int num) async {
   }
 }
 
-Future<List<dynamic>> getUserPostTags(int num) async {
+Future<List<dynamic>> getUserPostTagsWithToken(int num) async {
   try {
     Map<String, dynamic> userData = await getUserByToken();
     List<dynamic> posts = userData['posts'];
@@ -501,6 +499,14 @@ Future<List<dynamic>> getUserPostTags(int num) async {
     } else {
       return [];
     }
+  } catch (e) {
+    throw Exception('Failed to load posts: $e');
+  }
+}
+
+Future<List<dynamic>> getUserPostTags(dynamic posts) async {
+  try {
+    return posts['tags'];
   } catch (e) {
     throw Exception('Failed to load posts: $e');
   }
@@ -550,6 +556,21 @@ Future<bool> isUserPostOwner(int id_user) async {
   try {
     Map<String, dynamic> userData = await getUserByToken();
     if(userData['user_id'] == id_user || userData['admin']) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
+
+Future<bool> isUserAdmin(int id_user) async {
+  try {
+    Map<String, dynamic> userData = await getUserByToken();
+    if(userData['user_id'] == id_user && userData['admin']) {
       return true;
     }
     else {
@@ -617,5 +638,29 @@ Future<void> deletePost(int postId) async {
     }
   } catch (e) {
     print('Error deleting post: $e');
+  }
+}
+
+Future<void> deleteUser(int userId) async {
+  final apiUrl = 'http://195.10.205.87:8000/delete_user/$userId/';
+  final token = await getAccessToken();
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      print('Пользователь с ID $userId успешно удален');
+    } else {
+      print('Ошибка при удалении пользователя с ID $userId: ${response.statusCode}');
+      print('Тело ответа: ${response.body}');
+    }
+  } catch (e) {
+    print('Ошибка при удалении пользователя с ID $userId: $e');
   }
 }
