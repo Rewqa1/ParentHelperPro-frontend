@@ -510,7 +510,7 @@ Future<bool> isUserPostOwner(int id_user) async {
 Future<bool> isUserAdmin(int id_user) async {
   try {
     Map<String, dynamic> userData = await getUserByToken();
-    if(userData['user_id'] == id_user && userData['admin']) {
+    if(userData['user_id'] != id_user && userData['admin']) {
       return true;
     }
     else {
@@ -518,7 +518,7 @@ Future<bool> isUserAdmin(int id_user) async {
     }
   } catch (e) {
     print('Error: $e');
-    return true;
+    return false;
   }
 }
 
