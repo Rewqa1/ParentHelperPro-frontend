@@ -58,12 +58,17 @@ class _ProfilePageState extends State<ProfilePage> {
           IconButton(
             color: Colors.white,
             icon: const Icon(Icons.settings),
-            onPressed: () {
+            onPressed: () async {
               AppMetrica.reportEvent('toSettingsPage');
-              Navigator.push(
+              String? updatedAvatarUrl = await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
               );
+              if (updatedAvatarUrl != null) {
+                setState(() {
+                  _avatarUrl = updatedAvatarUrl;
+                });
+              }
             },
           ),
         ],

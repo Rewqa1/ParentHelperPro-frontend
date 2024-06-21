@@ -9,6 +9,7 @@ import 'package:PHelperPro/components/login_button.dart';
 import 'package:PHelperPro/components/registration_button.dart';
 import 'package:PHelperPro/Pages/Login/RegisterPage.dart';
 import 'package:PHelperPro/Pages/Login/ForgotPasswordPage.dart';
+
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
@@ -46,7 +47,6 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -64,7 +64,6 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
-
 
   void registration(BuildContext context) {
     Navigator.push(
@@ -87,14 +86,22 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 0),
-                Container(
-                  width: 208,
-                  height: 189,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/logo.png',
-                      width: 208,
-                      height: 189,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
+                  child: Container(
+                    width: 208,
+                    height: 189,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 208,
+                        height: 189,
+                      ),
                     ),
                   ),
                 ),

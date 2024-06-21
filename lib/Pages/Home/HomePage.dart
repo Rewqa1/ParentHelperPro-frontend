@@ -1,12 +1,19 @@
+import 'package:PHelperPro/Pages/Login/LoginPage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Categorys/CategorysPage.dart';
 import '../Profile/ProfilePage.dart';
 import '../Hints/HintGames.dart';
-import '../Hints/HintSport.dart';
-import '../Hints/HintParenting.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 
 class HomePage extends StatelessWidget {
+
+  Future<bool> checkAccessToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? accessToken = prefs.getString('accessToken');
+    return accessToken != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,17 +21,25 @@ class HomePage extends StatelessWidget {
         title: Text('Главная страница'),
         titleTextStyle: TextStyle(color: Colors.white),
         backgroundColor: Color.fromARGB(255, 222, 154, 87),
-        automaticallyImplyLeading: false, // убираем стрелку назад
+        automaticallyImplyLeading: false, 
         actions: [
           IconButton(
             color: Colors.white,
             icon: Icon(Icons.person),
-            onPressed: () {
-              AppMetrica.reportEvent('toProfilePage');
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
+            onPressed: () async {
+              bool hasAccessToken = await checkAccessToken();
+              if (hasAccessToken) {
+                AppMetrica.reportEvent('toProfilePage');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              }
             },
           ),
         ],
