@@ -38,7 +38,7 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
     try {
       bool isAdmin = await isUserAdmin(widget.id);
       setState(() {
-        _isAdmin = !isAdmin;
+        _isAdmin = isAdmin;
       });
     } catch (e) {
       print('Failed to check admin status: $e');
