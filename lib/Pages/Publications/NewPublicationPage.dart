@@ -115,6 +115,14 @@ class _NewPublicationPageState extends State<NewPublicationPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Нельзя опубликовать статью не выбрав категории')),
                         );
+                      } else if(_titleController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Нельзя опубликовать статью без заголовка')),
+                        );
+                      } else if(_contentController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Нельзя опубликовать статью без содержания')),
+                        );
                       } else {
                         try {
                           List<int> categoriesIndices = await returnMassiveIndex(); // Получаем индексы категорий
