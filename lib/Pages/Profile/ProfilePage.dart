@@ -128,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         } else if (snapshot.hasData) {
                           List<dynamic> posts = snapshot.data!['posts'];
                           if (posts.isEmpty) {
-                            return Center(child: Text('Постов нет :('));
+                            return Center(child: Text('Постов нет'));
                           } else {
                             return ListView.builder(
                               itemCount: posts.length,
