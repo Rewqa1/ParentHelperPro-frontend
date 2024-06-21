@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import '../Categorys/CategorysPage.dart';
 import '../Home/HomePage.dart';
 import '../Publications/PublicationPage.dart';
-import '../Publications/NewPublicationPage.dart';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:PHelperPro/djangoRequest.dart';
 import 'package:PHelperPro/enumCategorys.dart';
 
 class ProfileOtherPage extends StatefulWidget {
+  final int id;
   final String avatarUrl;
   final String firstName;
   final String lastName;
   final List<dynamic> posts;
 
   ProfileOtherPage({
+    required this.id,
     required this.avatarUrl,
     required this.firstName,
     required this.lastName,
@@ -25,11 +26,30 @@ class ProfileOtherPage extends StatefulWidget {
 }
 
 class _ProfileOtherPageState extends State<ProfileOtherPage> {
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAdminStatus();
+  }
+
+  Future<void> _checkAdminStatus() async {
+    try {
+      bool isAdmin = await isUserAdmin(widget.id);
+      setState(() {
+        _isAdmin = !isAdmin;
+      });
+    } catch (e) {
+      print('Failed to check admin status: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ваш профиль'),
+        title: Text(''),
         titleTextStyle: TextStyle(color: Colors.white),
         backgroundColor: Color.fromARGB(255, 222, 154, 87),
         automaticallyImplyLeading: true,
@@ -58,6 +78,19 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
               '${widget.firstName} ${widget.lastName}',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 20),
+            _isAdmin
+                ? ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () {
+                _showDeleteConfirmationDialog();
+              },
+              child: Text('Заблокировать пользователя'),
+            )
+                : SizedBox.shrink(),
             SizedBox(height: 20),
             Expanded(
               child: _buildPostsList(),
@@ -88,7 +121,7 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
             );
           } else if (index == 1) {
             AppMetrica.reportEvent('toCategorysPage');
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => CategorysPage()),
             );
@@ -102,18 +135,18 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
 
   Widget _buildPostsList() {
     if (widget.posts.isEmpty) {
-      return Center(child: Text('Постов нет :('));
+      return Center(child: Text('Постов нет.'));
     } else {
       return ListView.builder(
         itemCount: widget.posts.length,
         itemBuilder: (context, index) {
-          return _buildPostCard(widget.posts[index]);
+          return _buildPostCard(widget.posts[index], index);
         },
       );
     }
   }
 
-  Widget _buildPostCard(dynamic post) {
+  Widget _buildPostCard(dynamic post, int index) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -157,7 +190,7 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
               ),
               SizedBox(height: 12),
               FutureBuilder<List<dynamic>>(
-                future: getUserPostTags(post['id']), // Pass post id to get tags
+                future: getUserPostTags(widget.posts[index]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -165,8 +198,10 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
                     return Text('Failed to load tags: ${snapshot.error}');
                   } else if (snapshot.hasData) {
                     List<dynamic> tags = snapshot.data!;
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 2.0,
+                      runSpacing: 2.0,
                       children: tags.asMap().entries.map((entry) {
                         int idx = entry.key;
                         dynamic tag = entry.value;
@@ -198,5 +233,48 @@ class _ProfileOtherPageState extends State<ProfileOtherPage> {
     } else {
       return content.substring(0, maxLength) + '...';
     }
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Подтверждение удаления.'),
+          content:
+          Text('Вы уверены что хотите удалить пользователя ${widget.firstName} ${widget.lastName}?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Нет'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Да'),
+              onPressed: () async {
+                try {
+                  await deleteUser(widget.id);
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CategorysPage(),
+                      settings: RouteSettings(
+                        arguments:
+                        'Пользователь ${widget.firstName} ${widget.lastName} удален',
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  print('Failed to delete user: $e');
+                  // Handle error if necessary
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

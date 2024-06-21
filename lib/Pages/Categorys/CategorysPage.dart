@@ -149,9 +149,7 @@ class _CategorysPageState extends State<CategorysPage> {
         ElevatedButton(
           onPressed: () {
             setState(() {
-              // Инвертируем состояние фильтрации при нажатии на кнопку "Фильтрация"
               _isCategorySelectionExpanded = !_isCategorySelectionExpanded;
-              // Закрываем клавиатуру при открытии фильтрации
               FocusScope.of(context).unfocus();
             });
           },
@@ -224,7 +222,7 @@ class _CategorysPageState extends State<CategorysPage> {
           content = content.substring(0, 120) + '...';
         }
         return Container(
-          color: Colors.grey[300], // Серый фон для каждого ListTile
+          color: Colors.grey[300],
           margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
           child: ListTile(
             title: Column(
