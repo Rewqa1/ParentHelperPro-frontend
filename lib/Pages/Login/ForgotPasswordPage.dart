@@ -80,83 +80,87 @@ class ForgotPasswordPage extends StatelessWidget {
         child: GestureDetector(
           onTap: (){
             FocusScope.of(context).unfocus();
-          },      
-        child: SingleChildScrollView(
-          reverse: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(width: 5,),
-                  IconButton(
-                    icon: backArrowIcon,
-                    onPressed: () {
-                      AppMetrica.reportEvent('ForgotPasswordPageBackToLoginPage');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  SizedBox(width: 17,),
-                  Container(
-                    width: 208,
-                    height: 189,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/logo.png',
-                        width: 208,
-                        height: 189,
+          },
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: IconButton(
+                          icon: backArrowIcon,
+                          onPressed: () {
+                            AppMetrica.reportEvent('ForgotPasswordPageBackToLoginPage');
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Text(
-                'Восстановление пароля',
-                style: TextStyle(
-                  color: Color(0xFF000000),
-                  fontSize: 27,
-                  fontFamily: 'Montserrat',
+                    Center(
+                      child: Container(
+                        width: 208,
+                        height: 189,
+                        child: Center(
+                          child: Image.asset(
+                            'assets/logo.png',
+                            width: 208,
+                            height: 189,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 35),
-              LoginTextField(
-                controller: usernameController,
-                hintText: 'Логин',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: secretWordController,
-                hintText: 'Секретное слово',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: newPasswordController,
-                hintText: 'Новый пароль',
-                initialObscureText: true,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: confirmNewPasswordController,
-                hintText: 'Подтвердите новый пароль',
-                initialObscureText: true,
-              ),
-              
-              const SizedBox(height: 40),
-              RegButton(
-                text: 'Изменить пароль',
-                onTap: () {
-                  AppMetrica.reportEvent('ForgotPasswordButton');
-                  updateUserPassword(context);
-                },
-              ),
-            ],
+                const SizedBox(height: 15),
+                Text(
+                  'Восстановление пароля',
+                  style: TextStyle(
+                    color: Color(0xFF000000),
+                    fontSize: 27,
+                    fontFamily: 'Montserrat',
+                  ),
+                ),
+                const SizedBox(height: 35),
+                LoginTextField(
+                  controller: usernameController,
+                  hintText: 'Логин',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: secretWordController,
+                  hintText: 'Секретное слово',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: newPasswordController,
+                  hintText: 'Новый пароль',
+                  initialObscureText: true,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: confirmNewPasswordController,
+                  hintText: 'Подтвердите новый пароль',
+                  initialObscureText: true,
+                ),
+                const SizedBox(height: 40),
+                RegButton(
+                  text: 'Изменить пароль',
+                  onTap: () {
+                    AppMetrica.reportEvent('ForgotPasswordButton');
+                    updateUserPassword(context);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

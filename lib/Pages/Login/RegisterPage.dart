@@ -89,102 +89,107 @@ class RegistrationPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: GestureDetector(
-          onTap: (){
+          onTap: () {
             FocusScope.of(context).unfocus();
-          },      
-        child: SingleChildScrollView(
-          reverse: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(width: 5,),
-                  IconButton(
-                    icon: backArrowIcon,
-                    onPressed: () {
-                      AppMetrica.reportEvent('RegisterPageBackToLoginPage');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  SizedBox(width: 17,),
-                  Container(
-                    width: 208,
-                    height: 189,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/logo.png',
-                        width: 208,
-                        height: 189,
+          },
+          child: SingleChildScrollView(
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: IconButton(
+                          icon: backArrowIcon,
+                          onPressed: () {
+                            AppMetrica.reportEvent('RegisterPageBackToLoginPage');
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Text(
-                'Регистрация',
-                style: TextStyle(
-                  color: Color(0xFF000000),
-                  fontSize: 32,
-                  fontFamily: 'Montserrat',
+                    Center(
+                      child: Container(
+                        width: 208,
+                        height: 189,
+                        child: Center(
+                          child: Image.asset(
+                            'assets/logo.png',
+                            width: 208,
+                            height: 189,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 35),
-              LoginTextField(
-                controller: lastNameController,
-                hintText: 'Фамилия',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: firstNameController,
-                hintText: 'Имя',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: loginController,
-                hintText: 'Логин',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: emailController,
-                hintText: 'Почта',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: secretWordController,
-                hintText: 'Секретное слово',
-                initialObscureText: false,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: passwordController,
-                hintText: 'Пароль',
-                initialObscureText: true,
-              ),
-              const SizedBox(height: 20),
-              LoginTextField(
-                controller: confirmPasswordController,
-                hintText: 'Подтвердите пароль',
-                initialObscureText: true,
-              ),
-              const SizedBox(height: 25),
-              RegButton(
-                text: 'Зарегистрироваться',
-                onTap: () {
-                  AppMetrica.reportEvent('Registration');
-                  registerUser(context);
-                },
-              ),
-            ],
+                const SizedBox(height: 15),
+                Text(
+                  'Регистрация',
+                  style: TextStyle(
+                    color: Color(0xFF000000),
+                    fontSize: 32,
+                    fontFamily: 'Montserrat',
+                  ),
+                ),
+                const SizedBox(height: 35),
+                LoginTextField(
+                  controller: lastNameController,
+                  hintText: 'Фамилия',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: firstNameController,
+                  hintText: 'Имя',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: loginController,
+                  hintText: 'Логин',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: emailController,
+                  hintText: 'Почта',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: secretWordController,
+                  hintText: 'Секретное слово',
+                  initialObscureText: false,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: passwordController,
+                  hintText: 'Пароль',
+                  initialObscureText: true,
+                ),
+                const SizedBox(height: 20),
+                LoginTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'Подтвердите пароль',
+                  initialObscureText: true,
+                ),
+                const SizedBox(height: 25),
+                RegButton(
+                  text: 'Зарегистрироваться',
+                  onTap: () {
+                    AppMetrica.reportEvent('Registration');
+                    registerUser(context);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
